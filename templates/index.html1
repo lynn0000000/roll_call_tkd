@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <title>虎嘯跆拳道館 - 表格點名系統</title>
+    <style>
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background: linear-gradient(to bottom, #ffe4b5, #ffdead);
+            margin: 0;
+            padding: 20px;
+        }
+        h1 {
+            text-align: center;
+            color: #d35400;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #ccc;
+            text-align: center;
+            padding: 8px;
+        }
+        th {
+            background-color: #f39c12;
+            color: white;
+        }
+        td input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+        }
+        button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 18px;
+            background-color: #e67e22;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #d35400;
+        }
+        #result {
+            margin-top: 20px;
+            font-weight: bold;
+            font-size: 18px;
+        }
+    </style>
+</head>
+<body>
+
+<h1>虎嘯跆拳道館 - 表格點名</h1>
+
+<table id="attendanceTable">
+    <thead>
+        <tr>
+            <th>學生姓名</th>
+            <!-- 課堂時段欄位動態生成 -->
+        </tr>
+    </thead>
+    <tbody>
+        <!-- 學生列動態生成 -->
+    </tbody>
+</table>
+
+<button id="submitBtn">提交點名</button>
+<p id="result"></p>
+
+<script>
+    const students = [
+        {id: 1, name: "Alice"},
+        {id: 2, name: "Bob"},
+        {id: 3, name: "Cathy"}
+    ];
+
+    const classSlots = [
+        {id: 101, name: "W2 17:10"},
+        {id: 102, name: "W2 18:10"},
+        {id: 103, name: "W3 17:10"},
+        {id: 104, name: "W3 18:10"}
+    ];
+
+    const table = document.getElementById('attendanceTable');
+    const tbody = table.querySelector('tbody');
+
+    // 生成表頭
+    const theadRow = table.querySelector('thead tr');
+    classSlots.forEach(slot => {
+        const th = document.createElement('th');
+        th.textContent = slot.name;
+        theadRow.appendChild(th);
+    });
+
+    // 生成學生列
+    students.forEach(student => {
+        const tr = document.createElement('tr');
+        const tdName = document.createElement('td');
+        tdName.textContent = student.name;
+        tr.appendChild(tdName);
+
+        classSlots.forEach(slot => {
+            const td = document.createElement('td');
+            const checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.dataset.studentId = student.id;
+            checkbox.dataset.slotId = slot.id;
+            td.appendChild(checkbox);
+            tr.appendChild(td);
+        });
+
+        tbody.appendChild(tr);
+    });
+
+    // 點名提交
+    document.getElementById('submitBtn').addEventListener('click', async () => {
+        const checkboxes = document.querySelectorAll('input[type="checkbox"]:checked');
+        const attendances = Array.from(checkboxes).map(cb => ({
+            student_id: parseInt(cb.dataset.studentId),
+            class_slot_id: parseInt(cb.dataset.slotId),
+            attend_date: new Date().toISOString().slice(0,10) // 今天日期
+        }));
+
+        if(attendances.length === 0) {
+            alert("請至少勾選一個學生的課堂時段");
+            return;
+        }
+
+        try {
+            const response = await fetch('/attendance', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({attendances})
+            });
+
+            const resData = await response.json();
+            if(response.ok){
+                document.getElementById('result').textContent = `✅ ${resData.message}`;
+                document.getElementById('result').style.color = "green";
+            } else {
+                document.getElementById('result').textContent = `❌ ${resData.message}`;
+                document.getElementById('result').style.color = "red";
+            }
+        } catch(err) {
+            document.getElementById('result').textContent = `錯誤: ${err}`;
+            document.getElementById('result').style.color = "red";
+        }
+    });
+</script>
+
+</body>
+</html>

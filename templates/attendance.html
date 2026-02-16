@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>點名表</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='attendance.css') }}">
+    <!-- 字體 -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=SN+Pro&display=swap" rel="stylesheet">
+</head>
+<body>
+<h1>點名表</h1>
+
+<!-- 加上容器 -->
+<div class="table-container">
+<table>
+    <thead>
+        <tr>
+            <th>中文名字</th>
+            <th>英文名字</th>
+            {% for d in dates %}
+            <th>{{ d }}</th>
+            {% endfor %}
+        </tr>
+    </thead>
+    <tbody>
+        {% for stu in students %}
+        <tr>
+            <td style="background: linear-gradient(45deg, #4CDBEC, #3CA7ED)" >{{stu.chinese_name}}</td>
+            <td style="background: linear-gradient(45deg,  #3CA7ED,#4CDBEC)" >{{stu.name}}</td>
+            {% for d in dates %}
+            <td>
+                {% for label in ['A','B','C'] %}
+                <label>
+                    {{label}}
+                    <input type="checkbox" 
+                           data-student="{{stu.id}}" 
+                           data-date="{{ d }}"  
+                           data-slot="{{label}}">
+                </label>
+                {% endfor %}
+            </td>
+            {% endfor %}
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+</div>
+
+<button id="saveBtn">儲存點名</button>
+
+
+</body>
+<script>
+document.getElementById("saveBtn").addEventListener('click', () => {
+    const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+    let attendanceData = [];
+
+    checkboxes.forEach(cb => {
+        attendanceData.push({
+            student_id: cb.dataset.student,
+            attend_date: cb.dataset.date,
+            slot_name: cb.dataset.slot,
+            present: cb.checked
+        });
+    });
+
+    fetch('/save_attendance', {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify(attendanceData)
+    })
+    .then(res => res.json())
+    .then(data => alert("儲存成功"))
+    .catch(err => console.error(err));
+});
+</script>
+
+</html>
