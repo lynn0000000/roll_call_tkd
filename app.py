@@ -13,24 +13,39 @@ conn = mysql.connector.connect(
 )
 cursor = conn.cursor(dictionary=True)
 
+
 @app.route('/attendance_form')
 def attendance_form():
-    # 1. 抓學生資料
-    cursor.execute("SELECT id, chinese_name,name FROM students WHERE active=1")
+    # 抓學生資料
+    cursor.execute("SELECT id, chinese_name, name FROM students WHERE active=1")
     students = cursor.fetchall()
 
-    # 2. 找出本週有課的日期（用 class_slots 判斷星期幾有課）
+    # 本週有課的日期
     cursor.execute("SELECT DISTINCT weekday FROM class_slots")
     weekdays_with_class = [row['weekday'] for row in cursor.fetchall()]
 
     start_date = date.today()
-    dates = []
-    for i in range(7):
-        d = start_date + timedelta(days=i)
-        if d.isoweekday() in weekdays_with_class:
-            dates.append(str(d))
+    dates = [str(start_date + timedelta(days=i)) for i in range(7) 
+             if (start_date + timedelta(days=i)).isoweekday() in weekdays_with_class]
 
-    return render_template("attendance.html", students=students, dates=dates)
+    # 抓已存在的點名資料
+    cursor.execute("SELECT student_id, attend_date, slot_name, present FROM attendance")
+    attendance_records = cursor.fetchall()
+    
+    # 轉成方便前端查詢的 dict
+    attendance_map = {}
+    for rec in attendance_records:
+        key = (rec['student_id'], str(rec['attend_date']), rec['slot_name'])
+        attendance_map[key] = rec['present']
+
+    
+    return render_template(
+        "attendance.html", 
+        students=students, 
+        dates=dates, 
+        attendance_map=attendance_map
+    )
+
 
 # 儲存點名
 @app.route('/save_attendance', methods=['POST'])
@@ -52,4 +67,5 @@ def save_attendance():
     return jsonify({"status": "ok"})
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    # app.run(debug=True)
+    app.run(host="0.0.0.0", port=5000, debug=True)

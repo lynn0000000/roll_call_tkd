@@ -28,17 +28,20 @@
     <tbody>
         {% for stu in students %}
         <tr>
-            <td style="background: linear-gradient(45deg, #4CDBEC, #3CA7ED)" >{{stu.chinese_name}}</td>
-            <td style="background: linear-gradient(45deg,  #3CA7ED,#4CDBEC)" >{{stu.name}}</td>
+            <td class="chinese_name">{{stu.chinese_name}}</td>
+            <td class="name">{{stu.name}}</td>
             {% for d in dates %}
             <td>
                 {% for label in ['A','B','C'] %}
                 <label>
                     {{label}}
-                    <input type="checkbox" 
-                           data-student="{{stu.id}}" 
-                           data-date="{{ d }}"  
-                           data-slot="{{label}}">
+                   <input type="checkbox"
+                    data-student="{{ stu.id }}"
+                    data-date="{{ d }}"
+                    data-slot="{{ label }}"
+                    {% if attendance_map.get((stu.id, d, label)) %}
+                        checked
+                    {% endif %}>
                 </label>
                 {% endfor %}
             </td>
@@ -55,6 +58,10 @@
 </body>
 <script>
 document.getElementById("saveBtn").addEventListener('click', () => {
+     // 先跳出確認視窗
+    const confirmed = confirm("你確定要儲存嗎？");
+    if (!confirmed) return; // 用戶取消就停止
+    
     const checkboxes = document.querySelectorAll('input[type="checkbox"]');
     let attendanceData = [];
 

@@ -1,44 +1,54 @@
 body{
-    background-color: #ffffff;
+    background-color: #f4f8fb;   /* 淡藍灰底 */
     font-family: "SN Pro", sans-serif;
-    font-optical-sizing: auto;
     font-weight: 400;
-    font-style: normal;
-    color:#000000;
+    color:#1a1a1a;
     padding: 10px;
 }
 
 h1{
     text-align: center;
+    color: #1f3c88;  /* 深藍主色 */
 }
 
-/* 包表格的容器，讓小螢幕可水平捲動 */
+/* 表格容器 */
 .table-container {
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
 }
 
-/* 表格樣式 */
+/* 表格 */
 table{
-    border: #000000 solid 1px;
+    border: none;
     width: 100%;
     border-collapse: collapse;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    box-shadow: 0 6px 18px rgba(0,0,0,0.08);
     margin-bottom: 20px;
-    min-width: 600px; /* 平板最小寬度 */
+    background-color: #ffffff;
+    border-radius: 12px;
+    overflow: hidden;
+    min-width: 600px;
 }
 
-th, td {
-    border: 2px solid #555;
+/* 表頭 */
+th{
+    background: #4CDBEC;
+    color: #0d2c54;
+    padding: 10px;
+    font-weight: 600;
+}
+
+/* 表格內容 */
+td {
+    border-bottom: 1px solid #e0e6ed;
     text-align: center;
     padding: 8px;
+    color: #333;
+    white-space: nowrap;   /* 加這行 */
 }
 
-th{
-    background:  #4CDBEC;
-    color: #000000;
-}
 
+/* label */
 label{
     display: inline-flex;
     align-items: center;
@@ -48,35 +58,63 @@ label{
     font-size: 14px;
 }
 
+/* 中文名字欄位 */
+.chinese_name {
+    background: linear-gradient(45deg, #d0f0fb, #a0e0f5); /* 淡藍漸層 */
+    color: #0d2c54; /* 深藍文字 */
+    text-align: center;
+    padding: 8px;
+    font-weight: 500;
+}
+
+/* 英文名字欄位 */
+.name {
+    background: linear-gradient(45deg, #ffffff, #d0e8f9); /* 白到淡藍漸層 */
+    color: #0d2c54;
+    text-align: center;
+    padding: 8px;
+    font-weight: 500;
+}
+
+
+/* 滑鼠移上 tbody 的每行 td 高亮 */
+tbody tr:hover td {
+    background-color: #4CCFEF;  /* 飽和藍 */
+    color: #ffffff;              /* 白字對比明顯 */
+    transition: all 0.3s ease;
+}
+
+tbody tr:hover {
+    transform: scale(1.01);
+}
+
+
 /* 儲存按鈕 */
 #saveBtn {
-    background: linear-gradient(45deg, #4CDBEC, #3CA7ED, #0099ff);
+    background: linear-gradient(45deg, #4CDBEC, #3CA7ED);
     color: white;
     padding: 14px 30px;
     border: none;
-    border-radius: 10px;
+    border-radius: 12px;
     font-size: 18px;
     cursor: pointer;
-    transition: background 0.3s ease, transform 0.2s ease;
+    transition: all 0.2s ease;
     letter-spacing: 2px;
     display: block;
     margin: 20px auto;
+    box-shadow: 0 6px 12px rgba(60,167,237,0.3);
 }
 
 #saveBtn:hover {
-    background: linear-gradient(45deg, #3CA7ED,#4CDBEC);
-    transform: scale(1.05);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 18px rgba(60,167,237,0.4);
 }
 
 #saveBtn:active {
-    transform: scale(0.95);
+    transform: scale(0.96);
 }
 
-tr:hover{
-    background-color: #FFCC03;
-}
-
-/* 小螢幕優化 (手機) */
+/* 手機 */
 @media (max-width: 768px) {
     label {
         width: 40px;
@@ -91,7 +129,7 @@ tr:hover{
     }
 }
 
-/* 大螢幕 (桌面) */
+/* 桌面 */
 @media (min-width: 1200px) {
     label {
         width: 60px;
